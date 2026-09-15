@@ -40,6 +40,12 @@ void Copter::Log_Write_Control_Tuning()
         target_climb_rate_ms = pos_control->get_vel_target_U_ms();
     }
 
+    float climb_rate_ms = 0.0f;
+    float velocity_d_ms;
+    if (AP::ahrs().get_velocity_D(velocity_d_ms)) {
+        climb_rate_ms = -velocity_d_ms;
+    }
+
     float desired_rangefinder_alt_m;
 #if AP_RANGEFINDER_ENABLED
     if (!surface_tracking.get_target_dist_for_logging(desired_rangefinder_alt_m)) {
@@ -68,7 +74,7 @@ void Copter::Log_Write_Control_Tuning()
 #endif
         terr_alt                : terr_alt,
         target_climb_rate_ms    : target_climb_rate_ms,
-        climb_rate_ms           : pos_control->get_vel_estimate_U_ms()
+        climb_rate_ms           : climb_rate_ms
     };
     logger.WriteBlock(&pkt, sizeof(pkt));
 }
